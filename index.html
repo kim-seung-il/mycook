@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>마이쿡 — 우리 가족의 식사 시간표</title>
+    <meta
+      name="description"
+      content="가족마다 다른 일정에 맞춰 오늘 차릴 메뉴를 추천하고, 요리하면서 보기 쉬운 레시피를 보여주는 가족 식사 사이트"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      as="style"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <!-- ───────────────────────── 헤더 ───────────────────────── -->
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="#/">
+          <span class="brand-mark">마이<em>쿡</em></span>
+          <span class="brand-sub">Family Table</span>
+        </a>
+
+        <nav class="nav" id="nav">
+          <a href="#/" data-route="home">오늘의 추천</a>
+          <a href="#/theme/onedish" data-route="theme/onedish">한 끼 식사</a>
+          <a href="#/theme/side" data-route="theme/side">반찬</a>
+          <a href="#/theme/morning" data-route="theme/morning">아침 메뉴</a>
+          <a href="#/saved" data-route="saved">저장한 영상</a>
+        </nav>
+
+        <button
+          class="icon-btn"
+          id="themeToggle"
+          title="밝은 화면 / 어두운 화면 전환"
+          aria-label="화면 밝기 전환"
+        >
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path id="themeIcon" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+          </svg>
+        </button>
+
+        <button class="icon-btn menu-toggle" id="menuToggle" aria-label="메뉴 열기">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 6h18M3 12h18M3 18h18" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ───────────────────────── 본문 ───────────────────────── -->
+    <main id="app"></main>
+
+    <!-- ───────────────────────── 푸터 ───────────────────────── -->
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <div>
+          <span class="brand-mark" style="font-size: 20px">마이<em>쿡</em></span>
+          <p style="margin-top: 10px">
+            가족마다 다른 일정에 맞춰 오늘 차릴 메뉴를 먼저 보여주고,
+            요리하면서 보기 쉬운 레시피를 제공합니다.
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="#/">오늘의 추천</a>
+          <a href="#/theme/onedish">한 끼 식사</a>
+          <a href="#/theme/side">반찬</a>
+          <a href="#/theme/morning">아침 메뉴</a>
+          <a href="#/saved">저장한 영상</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ───────────────────────── 요리 모드 ───────────────────────── -->
+    <div class="cook" id="cook" role="dialog" aria-modal="true" aria-label="요리 모드">
+      <div class="cook-bar">
+        <button class="icon-btn" id="cookClose" aria-label="요리 모드 닫기">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <span class="ttl" id="cookTitle"></span>
+        <span class="pos" id="cookPos"></span>
+      </div>
+      <div class="cook-prog"><span id="cookProg"></span></div>
+      <div class="cook-body">
+        <div class="cook-main" id="cookMain"></div>
+        <aside class="cook-side" id="cookSide"></aside>
+      </div>
+      <div class="cook-foot">
+        <button class="btn btn-ghost" id="cookPrev">이전 단계</button>
+        <div class="spacer"></div>
+        <div class="cook-dots" id="cookDots"></div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" id="cookNext">다음 단계</button>
+      </div>
+    </div>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>

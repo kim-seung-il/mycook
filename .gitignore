@@ -1,0 +1,9 @@
+# 공개 저장소에 올리지 않을 것 — 가족의 생활 일정이 적혀 있습니다
+requirements.md
+
+# 내부용 메모와 도구 설정
+README.md
+.claude/
+
+# 배포용 임시 폴더 (index.html과 assets로 매번 다시 만듭니다)
+publish/
