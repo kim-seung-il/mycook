@@ -167,6 +167,8 @@ function viewHome() {
     (r) => r.slots.includes('family') || r.slots.includes('familyAM')
   ).slice(0, 4);
 
+  const trending = RECIPES.filter((r) => r.traits.includes('trend'));
+
   app.innerHTML = `
     <div class="view">
       <section class="wrap hero">
@@ -208,6 +210,17 @@ function viewHome() {
           </div>
         </div>
         <div class="theme-grid">${themeCards}</div>
+      </section>
+
+      <section class="wrap list-section">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">요즘 인기</span>
+            <h2>요즘 많이 해 먹는 메뉴</h2>
+            <p>짧은 영상과 집밥 기사에서 자주 보이는 메뉴 중, 재료가 적고 조리가 쉬운 것만 골랐습니다.</p>
+          </div>
+        </div>
+        <div class="card-grid">${trending.slice(0, 6).map(cardHTML).join('')}</div>
       </section>
 
       <section class="wrap list-section">
@@ -261,6 +274,7 @@ function themeIcon(kind) {
 /* ---------------------------------------------- 테마 목록 */
 const FILTERS = [
   { id: 'all', label: '전체' },
+  { id: 'trend', label: '요즘 인기' },
   { id: 'quick', label: '15분 이내' },
   { id: 'protein', label: '단백질 든든' },
   { id: 'kid', label: '아이 입맛' },
