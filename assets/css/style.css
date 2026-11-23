@@ -190,7 +190,15 @@ ol {
   display: flex;
   align-items: center;
   gap: 28px;
-  height: 72px;
+  min-height: 72px;
+  /* 글자가 커서 한 줄에 다 안 들어가면 넘치는 대신 아래로 접힙니다 */
+  flex-wrap: wrap;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.nav {
+  flex-wrap: wrap;
 }
 
 .brand {
@@ -344,6 +352,15 @@ ol {
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+
+.section-head > div,
+.plan-head > div,
+.up-head > div,
+.steps-head > div {
+  flex: 1 1 280px;
+  min-width: 0;
 }
 
 .section-head h2 {
@@ -468,6 +485,13 @@ ol {
   flex-wrap: wrap;
 }
 
+/* 글자 크기를 키운 기기에서 왼쪽 글 칸이 한 단어 폭으로 찌그러지지 않게,
+   최소 폭을 주고 모자라면 날짜 칸이 아래로 내려가게 합니다 */
+.hero-top > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
 .hero h1 {
   font-size: clamp(30px, 5.2vw, 50px);
   margin-top: 14px;
@@ -492,7 +516,7 @@ ol {
   border-radius: var(--r-md);
   padding: 16px 20px;
   box-shadow: var(--shadow-sm);
-  min-width: 212px;
+  flex: 0 1 auto;
 }
 
 .today-badge .d1 {
