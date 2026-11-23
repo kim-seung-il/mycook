@@ -245,7 +245,7 @@ function viewHome() {
               <span class="eyebrow">앞으로 3일</span>
               <h3>미리 보는 식사 계획</h3>
             </div>
-            <span class="hint">장보기 전에 훑어보기 좋습니다.</span>
+            <a class="link-more" href="#/shopping">이 기간 장보기 목록 →</a>
           </div>
           <div class="up-grid">${upcomingCards}</div>
         </div>
@@ -807,6 +807,240 @@ function viewSaved() {
   render();
 }
 
+/* ---------------------------------------------- 장보기 목록 */
+
+/* 마트에서 도는 순서대로 묶습니다. 위에서부터 먼저 맞는 규칙을 씁니다. */
+const MART_RULES = [
+  // 양념은 집에 있을 수 있으니 따로 모읍니다
+  ['양념 · 조미료', ['땅콩버터', '콩가루', '다진 마늘', '진간장', '국간장', '간장', '고추장', '된장', '고춧가루', '설탕', '소금', '후추', '식용유', '올리브유', '참기름', '들기름', '식초', '맛술', '올리고당', '꿀', '메이플', '연유', '마요네즈', '케첩', '머스터드', '굴소스', '새우젓', '액젓', '카레가루', '전분', '부침가루', '베이킹파우더', '통깨', '검은깨', '계피', '코코아', '파슬리', '파마산', '치즈가루', '버터', '국물내기 팩', '레몬즙', '배즙', '사과즙']],
+  ['가공식품 · 냉장', ['참치 통조림', '김치', '카레 고형 루', '파스타 소스', '소스', '견과류', '맛살']],
+  ['수산 · 건어물', ['어묵', '새우', '멸치', '진미채', '미역', '다시마', '김가루', '구운 김', '유부']],
+  ['정육 · 계란', ['돼지고기', '소고기', '불고기용', '닭가슴살', '닭다리', '닭봉', '베이컨', '소시지', '스팸', '햄', '메추리알', '달걀', '계란']],
+  ['유제품 · 두부', ['두부', '우유', '두유', '요거트', '생크림', '치즈']],
+  ['쌀 · 면 · 빵 · 떡', ['쌀', '밥', '식빵', '통밀빵', '빵', '스파게티', '우동 사리', '당면', '떡', '오트밀', '귀리']],
+  ['채소 · 과일', ['양파', '대파', '쪽파', '마늘', '감자', '고구마', '당근', '애호박', '호박', '오이', '배추', '양배추', '양상추', '깻잎', '고추', '파프리카', '피망', '버섯', '팽이', '느타리', '표고', '시금치', '콩나물', '바나나', '사과', '딸기', '블루베리', '토마토', '생강']]
+];
+
+const SKIP_PREFIX = ['물', '찬물', '쌀뜨물'];
+
+function martGroup(name) {
+  for (const [group, keys] of MART_RULES) {
+    if (keys.some((k) => name.indexOf(k) > -1)) return group;
+  }
+  if (name === '무') return '채소 · 과일';
+  return '그 밖에';
+}
+
+/* "1/2개", "1.5컵(300ml)" 같은 분량을 더할 수 있게 쪼갭니다 */
+function parseQty(q) {
+  // 분수를 먼저 보지 않으면 "1/4개"의 1만 읽고 "/4개"가 단위가 됩니다
+  const m = String(q).trim().match(/^([0-9]+\/[0-9]+|[0-9]+(?:\.[0-9]+)?)\s*(.*)$/);
+  if (!m) return null;
+  let n;
+  if (m[1].indexOf('/') > -1) {
+    const p = m[1].split('/');
+    n = Number(p[0]) / Number(p[1]);
+  } else {
+    n = parseFloat(m[1]);
+  }
+  const unit = m[2].replace(/\s*\([^)]*\)/g, '').trim();
+  return { n, unit };
+}
+
+function fmtQty(n, unit) {
+  const frac = { 0.25: '1/4', 0.3333: '1/3', 0.5: '1/2', 0.6667: '2/3', 0.75: '3/4' };
+  const whole = Math.floor(n);
+  const rest = Math.round((n - whole) * 10000) / 10000;
+  let head = '';
+  for (const k in frac) {
+    if (Math.abs(rest - Number(k)) < 0.02) head = frac[k];
+  }
+  let text;
+  if (head) text = whole > 0 ? `${whole}과 ${head}` : head;
+  else text = String(Math.round(n * 10) / 10);
+  return text + unit;
+}
+
+function buildShoppingList(days) {
+  const items = {};
+  const dayLabels = [];
+
+  for (let i = 0; i < days; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const ctx = todayContext(d);
+    dayLabels.push(`${d.getMonth() + 1}/${d.getDate()}(${DAY_KO[d.getDay()]})`);
+
+    buildTodayPlan(ctx, d).forEach((slot) => {
+      const r = slot.recipe;
+      // 양념도 함께 담습니다. 집에 없을 수 있으니 빠뜨리면 안 됩니다.
+      const all = (r.ingredients || []).concat(r.seasoning || []);
+      all.forEach((ing) => {
+        // "식용유 또는 버터"처럼 고를 수 있는 재료는 앞의 것으로 묶습니다
+        const key = ing.n.split(' 또는 ')[0].trim();
+        if (SKIP_PREFIX.some((p) => key.indexOf(p) === 0)) return;
+        if (!items[key]) {
+          items[key] = { name: key, group: martGroup(key), qtys: [], menus: new Set(), optional: true };
+        }
+        items[key].qtys.push(ing.q);
+        items[key].menus.add(r.name);
+        if (!(ing.note && ing.note.indexOf('선택') > -1)) items[key].optional = false;
+      });
+    });
+  }
+
+  // 같은 단위끼리 분량을 더합니다
+  Object.values(items).forEach((it) => {
+    const sums = {};
+    const raw = [];
+    it.qtys.forEach((q) => {
+      const p = parseQty(q);
+      // "약간"처럼 숫자가 없는 분량은 여러 번 나와도 한 번만 적습니다
+      if (p) sums[p.unit] = (sums[p.unit] || 0) + p.n;
+      else if (raw.indexOf(q) === -1) raw.push(q);
+    });
+    const parts = Object.keys(sums).map((u) => fmtQty(sums[u], u));
+    it.total = parts.concat(raw).join(' + ') || '적당량';
+  });
+
+  const grouped = {};
+  Object.values(items).forEach((it) => {
+    (grouped[it.group] = grouped[it.group] || []).push(it);
+  });
+  Object.values(grouped).forEach((list) => list.sort((a, b) => a.name.localeCompare(b.name)));
+
+  const order = MART_RULES.map((r) => r[0]).concat(['그 밖에']);
+  const ordered = order.filter((g) => grouped[g]).map((g) => ({ group: g, items: grouped[g] }));
+  return { groups: ordered, dayLabels, count: Object.keys(items).length };
+}
+
+const CART_KEY = 'mycook.cart';
+let shoppingDays = 4;
+
+function getCart() {
+  try {
+    return JSON.parse(localStorage.getItem(CART_KEY) || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+
+function setCart(c) {
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(c));
+  } catch (e) {}
+}
+
+function viewShopping() {
+  const render = () => {
+    const data = buildShoppingList(shoppingDays);
+    const cart = getCart();
+
+    document.getElementById('shRange').textContent =
+      `${data.dayLabels[0]} ~ ${data.dayLabels[data.dayLabels.length - 1]} · 재료 ${data.count}가지`;
+
+    document.getElementById('shList').innerHTML = data.groups
+      .map(
+        (g) => `
+        <section class="sh-group">
+          <h3>${esc(g.group)} <span class="cnt">${g.items.length}</span></h3>
+          <ul>
+            ${g.items
+              .map(
+                (it) => `
+              <li class="sh-row${cart[it.name] ? ' done' : ''}">
+                <label>
+                  <input type="checkbox" data-k="${esc(it.name)}"${cart[it.name] ? ' checked' : ''} />
+                  <span class="nm">${esc(it.name)}${it.optional ? ' <span class="chip">선택</span>' : ''}</span>
+                  <span class="qt">${esc(it.total)}</span>
+                </label>
+                <p class="src">${esc([...it.menus].join(' · '))}</p>
+              </li>`
+              )
+              .join('')}
+          </ul>
+        </section>`
+      )
+      .join('');
+
+    document.querySelectorAll('.sh-row input').forEach((cb) =>
+      cb.addEventListener('change', () => {
+        const c = getCart();
+        if (cb.checked) c[cb.dataset.k] = 1;
+        else delete c[cb.dataset.k];
+        setCart(c);
+        cb.closest('.sh-row').classList.toggle('done', cb.checked);
+      })
+    );
+
+    document.querySelectorAll('.dbtn').forEach((b) =>
+      b.classList.toggle('on', Number(b.dataset.d) === shoppingDays)
+    );
+  };
+
+  app.innerHTML = `
+    <div class="view">
+      <section class="wrap hero" style="padding-bottom:0">
+        <div class="crumb"><a href="#/">오늘의 추천</a> <span>›</span> <span>장보기 목록</span></div>
+        <span class="eyebrow">장보기</span>
+        <h1>이 기간에 필요한 재료</h1>
+        <p class="hero-note">추천된 식단에 들어가는 재료를 모아 마트 코너별로 묶었습니다. 산 것은 눌러서 지울 수 있고, 이 기기에 기억됩니다.</p>
+      </section>
+
+      <section class="wrap list-section" style="padding-top:30px">
+        <div class="sh-bar">
+          <div class="sh-days">
+            <button class="dbtn" data-d="4">오늘부터 4일</button>
+            <button class="dbtn" data-d="7">일주일</button>
+          </div>
+          <span class="sh-range" id="shRange"></span>
+          <div class="sh-acts">
+            <button class="sc-btn" id="shCopy">목록 복사</button>
+            <button class="sc-btn" id="shReset">체크 지우기</button>
+          </div>
+        </div>
+        <div id="shList" class="sh-list"></div>
+      </section>
+    </div>`;
+
+  document.querySelectorAll('.dbtn').forEach((b) =>
+    b.addEventListener('click', () => {
+      shoppingDays = Number(b.dataset.d);
+      render();
+    })
+  );
+
+  document.getElementById('shReset').addEventListener('click', () => {
+    setCart({});
+    render();
+  });
+
+  document.getElementById('shCopy').addEventListener('click', () => {
+    const data = buildShoppingList(shoppingDays);
+    const text =
+      `마이쿡 장보기 (${data.dayLabels[0]} ~ ${data.dayLabels[data.dayLabels.length - 1]})\n\n` +
+      data.groups
+        .map(
+          (g) =>
+            `[${g.group}]\n` +
+            g.items.map((it) => `- ${it.name} ${it.total}${it.optional ? ' (선택)' : ''}`).join('\n')
+        )
+        .join('\n\n');
+    const btn = document.getElementById('shCopy');
+    const done = () => {
+      btn.textContent = '복사했습니다';
+      setTimeout(() => (btn.textContent = '목록 복사'), 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, () => alert(text));
+    } else {
+      alert(text);
+    }
+  });
+
+  render();
+}
+
 function viewNotFound() {
   app.innerHTML = `
     <div class="view wrap" style="padding-top:80px">
@@ -829,6 +1063,7 @@ function route() {
     viewTheme(arg);
   } else if (seg === 'recipe') viewRecipe(arg);
   else if (seg === 'saved') viewSaved();
+  else if (seg === 'shopping') viewShopping();
   else viewNotFound();
 
   const current = hash || '';
