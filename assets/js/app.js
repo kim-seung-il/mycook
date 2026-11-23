@@ -690,7 +690,8 @@ function renderCook() {
     <h2>${esc(s.t)}</h2>
     ${body}
     ${s.meta ? `<div class="step-meta" style="margin-top:22px">${s.meta.map((m) => `<span class="chip accent">${esc(m)}</span>`).join('')}</div>` : ''}
-    ${s.tip ? `<div class="tipbox"><b>요령</b> · ${esc(s.tip)}</div>` : ''}`;
+    ${s.tip ? `<div class="tipbox"><b>요령</b> · ${esc(s.tip)}</div>` : ''}
+    ${cookIdx < total - 1 ? '<p class="cook-hint">화면 아무 곳이나 누르면 다음 단계로 넘어갑니다</p>' : ''}`;
 
   document.getElementById('cookPos').textContent = `${cookIdx + 1} / ${total}`;
   document.getElementById('cookProg').style.width = `${((cookIdx + 1) / total) * 100}%`;
@@ -800,6 +801,14 @@ document.getElementById('cookNext').addEventListener('click', () => {
     cookIdx++;
     renderCook();
   } else closeCook();
+});
+
+/* 손에 양념이 묻어 있어도 넘길 수 있게, 본문을 누르면 다음 단계로 갑니다 */
+document.querySelector('.cook-main').addEventListener('click', () => {
+  if (cookIdx < cookSteps.length - 1) {
+    cookIdx++;
+    renderCook();
+  }
 });
 document.addEventListener('keydown', (e) => {
   if (!cookEl.classList.contains('on')) return;
