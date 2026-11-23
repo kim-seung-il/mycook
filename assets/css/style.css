@@ -1622,6 +1622,35 @@ ol {
   color: var(--accent);
 }
 
+/* ---------------------------------------------- 출처 안내 */
+.src-box {
+  margin-top: 28px;
+  padding: 16px 20px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  display: flex;
+  gap: 12px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.src-box b {
+  color: var(--ink-2);
+}
+
+.src-box a {
+  color: var(--accent);
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.src-box a:hover {
+  text-decoration: underline;
+}
+
 /* ---------------------------------------------- 장보기 목록 */
 .sh-bar {
   display: flex;

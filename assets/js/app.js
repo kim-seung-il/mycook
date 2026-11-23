@@ -507,6 +507,19 @@ function viewRecipe(id) {
                     .join('')}</ul></div>`
                 : ''
             }
+
+            ${
+              r.source
+                ? `<div class="src-box">
+                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="flex-shrink:0;margin-top:3px"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+                     <div>
+                       <b>${esc(r.source.name)}</b>의 영상을 보고 정리했습니다.
+                       ${r.source.note ? `<br>${esc(r.source.note)}` : ''}
+                       <br><a href="${esc(r.source.url)}" target="_blank" rel="noopener noreferrer">원본 영상 열기 →</a>
+                     </div>
+                   </div>`
+                : ''
+            }
           </div>
         </div>
       </section>
