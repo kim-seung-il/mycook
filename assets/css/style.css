@@ -813,6 +813,75 @@ ol {
   gap: 11px;
 }
 
+/* ---------------------------------------------- 메뉴 그림 */
+.rc-art,
+.detail-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  color: var(--accent);
+}
+
+.rc-art {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 16px;
+}
+
+.rc-art svg {
+  width: 52%;
+  max-width: 120px;
+  opacity: 0.9;
+  transition: transform 0.4s var(--ease);
+}
+
+.rc:hover .rc-art svg {
+  transform: scale(1.06) translateY(-2px);
+}
+
+.detail-art {
+  aspect-ratio: 5 / 1;
+  min-height: 140px;
+  margin-bottom: 30px;
+  border-radius: var(--r-lg);
+}
+
+.detail-art svg {
+  width: 150px;
+  opacity: 0.92;
+}
+
+/* 네 가지 색조로 번갈아 칠해 목록이 단조롭지 않게 합니다 */
+.tint-1 {
+  background: linear-gradient(140deg, var(--accent-soft) 0%, var(--surface-2) 100%);
+}
+
+.tint-2 {
+  background: linear-gradient(140deg, var(--gold-soft) 0%, var(--surface-2) 100%);
+  color: var(--gold);
+}
+
+.tint-3 {
+  background: linear-gradient(140deg, var(--olive-soft) 0%, var(--surface-2) 100%);
+  color: var(--olive);
+}
+
+.tint-4 {
+  background: linear-gradient(140deg, var(--surface-2) 0%, var(--bg-deep) 100%);
+  color: var(--muted);
+}
+
+@media (max-width: 980px) {
+  .detail-art {
+    aspect-ratio: 3 / 1;
+    min-height: 120px;
+  }
+  .detail-art svg {
+    width: 120px;
+  }
+}
+
 /* ---------------------------------------------- 메뉴 카드 */
 .list-section {
   padding: 56px 0 0;

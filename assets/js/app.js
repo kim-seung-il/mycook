@@ -328,9 +328,88 @@ function viewHome() {
     </div>`;
 }
 
+/* ---------------------------------------------- 메뉴 그림
+ * 사진 대신 메뉴 종류에 맞는 선 그림을 붙입니다.
+ * 위에서부터 먼저 맞는 규칙을 씁니다.
+ */
+const ART_RULES = [
+  ['drink', ['셰이크', '요거트 오트볼']],
+  ['dessert', ['브라우니', '카스테라', '아이스크림', '맛탕', '감자칩', '찹쌀떡', '쿠키']],
+  ['bread', ['토스트', '샌드위치', '팬케이크', '빵']],
+  ['egg', ['달걀찜', '스크램블', '계란말이', '달걀밥', '계란조림', '달걀 덮밥']],
+  ['soup', ['국', '탕', '찌개', '나베', '전골', '국밥']],
+  ['noodle', ['국수', '우동', '파스타', '잡채', '라면', '떡볶이']],
+  ['rice', ['밥', '덮밥', '비빔밥', '주먹밥', '카레', '솥밥']],
+  ['grill', ['불고기', '제육', '구이', '강정', '전']],
+  ['salad', ['무침', '생채', '나물', '오이', '샐러드']],
+  ['stirfry', ['볶음', '볶기', '조림', '장조림']]
+];
+
+function dishArt(r) {
+  for (const [kind, keys] of ART_RULES) {
+    if (keys.some((k) => r.name.indexOf(k) > -1)) return kind;
+  }
+  if (r.themes.indexOf('snack') > -1) return 'dessert';
+  if (r.themes.indexOf('morning') > -1) return 'egg';
+  if (r.themes.indexOf('side') > -1) return 'stirfry';
+  return 'rice';
+}
+
+const ART_TINT = {
+  rice: 1,
+  soup: 2,
+  noodle: 3,
+  stirfry: 4,
+  grill: 2,
+  egg: 3,
+  bread: 1,
+  salad: 4,
+  dessert: 3,
+  drink: 1
+};
+
+function artSVG(kind) {
+  const o =
+    'viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"';
+  // 김은 부드러운 곡선으로 그려야 작게 봐도 자연스럽습니다
+  const steam =
+    '<path d="M50 24c-5-5 5-8 0-14" opacity=".45"/><path d="M60 22c-5-5 5-8 0-14" opacity=".45"/><path d="M70 24c-5-5 5-8 0-14" opacity=".45"/>';
+  const bowl = (y) =>
+    `<path d="M26 ${y}h68a34 34 0 0 1-68 0Z"/><path d="M20 ${y}h80"/>`;
+  const art = {
+    // 밥 — 그릇 위로 봉긋하게 담긴 모양
+    rice: `${steam}${bowl(44)}<path d="M40 44a20 13 0 0 1 40 0"/><path d="M50 40h4M62 38h5M56 44h8" opacity=".45"/>`,
+    // 국 — 그릇과 숟가락
+    soup: `${steam}${bowl(44)}<path d="M44 52c5 4 9 4 14 0s9-4 14 0" opacity=".5"/><path d="M96 34c5 0 7 4 5 8l-4 8" stroke-width="2"/>`,
+    // 면 — 그릇에 담긴 면과 젓가락
+    noodle: `${steam}${bowl(44)}<path d="M40 44c0-8 5-13 10-13s10 5 10 13M60 44c0-8 5-13 10-13s10 5 10 13" opacity=".7"/><path d="M88 22 70 46" stroke-width="2.3"/><path d="M94 26 76 50" stroke-width="2.3"/>`,
+    // 볶음·조림 — 손잡이 달린 팬
+    stirfry: `<path d="M20 38h58a29 29 0 0 1-58 0Z"/><path d="M78 40h24" stroke-width="2.3"/><circle cx="38" cy="46" r="3.2" opacity=".6"/><circle cx="50" cy="50" r="3.2" opacity=".6"/><circle cx="62" cy="46" r="3.2" opacity=".6"/><path d="M36 26c-4-4 4-6 0-11M52 24c-4-4 4-6 0-11" opacity=".4"/>`,
+    // 구이 — 접시에 올린 고기
+    grill: `<ellipse cx="60" cy="48" rx="36" ry="15"/><path d="M46 44c3-7 12-10 20-7s11 10 6 14-20 4-26-1Z" opacity=".9"/><path d="M52 44c4-3 9-4 13-2" opacity=".4"/>`,
+    // 달걀 — 프라이
+    egg: `<path d="M34 42c-6-12 6-22 18-20 10 2 10 10 18 9 12-1 18 8 14 16-4 9-20 14-32 12s-14-9-18-17Z"/><circle cx="54" cy="42" r="10"/><path d="M50 38a5 5 0 0 1 5-3" opacity=".45"/>`,
+    // 빵 — 식빵 한 장
+    bread: `<path d="M34 32c0-9 9-14 26-14s26 5 26 14v26a5 5 0 0 1-5 5H39a5 5 0 0 1-5-5Z"/><path d="M34 36h52" opacity=".5"/><path d="M48 46h24M48 54h15" opacity=".45"/>`,
+    // 나물·무침 — 그릇 위로 솟은 잎
+    salad: `${bowl(46)}<path d="M50 46c-9-3-13-13-8-19 7 3 12 12 8 19Z" opacity=".9"/><path d="M62 46c-3-10 3-18 10-18 1 8-3 16-10 18Z" opacity=".9"/><path d="M74 46c0-7 6-11 11-9-1 6-5 9-11 9Z" opacity=".9"/>`,
+    // 간식 — 컵에 담긴 디저트
+    dessert: `<path d="M36 34h48l-5 27a6 6 0 0 1-6 5H47a6 6 0 0 1-6-5Z"/><path d="M32 34h56" opacity=".6"/><path d="M48 28c-4-5 4-7 0-12M60 26c-4-5 4-7 0-12M72 28c-4-5 4-7 0-12" opacity=".45"/>`,
+    // 음료 — 빨대 꽂은 컵
+    drink: `<path d="M42 26h36l-5 38a6 6 0 0 1-6 5H53a6 6 0 0 1-6-5Z"/><path d="M44 40h32" opacity=".55"/><path d="M72 18 60 30" stroke-width="2.3"/><circle cx="56" cy="52" r="2.8" opacity=".5"/><circle cx="65" cy="58" r="2.2" opacity=".5"/>`
+  };
+  return `<svg ${o} aria-hidden="true">${art[kind] || art.rice}</svg>`;
+}
+
+function artBlock(r, cls) {
+  const kind = dishArt(r);
+  return `<div class="${cls} tint-${ART_TINT[kind] || 1}">${artSVG(kind)}</div>`;
+}
+
 function cardHTML(r) {
   return `
     <a class="rc" href="#/recipe/${r.id}">
+      ${artBlock(r, 'rc-art')}
       <div class="rc-top">
         <span class="rc-theme">${esc(themeNames(r))}</span>
         <span class="rc-time">${r.time}분</span>
@@ -457,6 +536,8 @@ function viewRecipe(id) {
           <a href="#/theme/${r.themes[0]}">${esc(THEMES[r.themes[0]].name)}</a>
           <span>›</span> <span>${esc(r.name)}</span>
         </div>
+
+        ${artBlock(r, 'detail-art')}
 
         <div class="detail-hero">
           <div>
