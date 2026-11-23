@@ -43,7 +43,8 @@ function todayContext(date = new Date()) {
         { slot: 'familyAM', title: '토요일 아침', who: '가족 네 명', max: 40, why: '네 식구가 함께 먹을 수 있는 시간이라 든든한 메뉴로 골랐습니다.' },
         { slot: 'side', title: '곁들임 반찬', who: '함께', max: 15, why: '한 상에 올릴 반찬을 하나만 더합니다.' },
         { slot: 'jeomjeo', title: '점심 · 간단히', who: '각자', max: 20, why: '아침을 든든히 먹었으니 점심은 가볍고 빠르게 준비합니다.' },
-        { slot: 'late', title: '저녁', who: '각자 일정에 맞춰', max: 25, why: '저녁은 각자 시간이 달라 간단히 차릴 수 있는 메뉴로 골랐습니다.' }
+        { slot: 'late', title: '저녁', who: '각자 일정에 맞춰', max: 25, why: '저녁은 각자 시간이 달라 간단히 차릴 수 있는 메뉴로 골랐습니다.' },
+        { slot: 'snack', title: '간식', who: '아이들', max: 30, why: '주말 오후에 아이들과 함께 만들어 먹기 좋은 간식입니다.' }
       ]
     };
   }
@@ -60,7 +61,8 @@ function todayContext(date = new Date()) {
         { slot: 'familyAM', title: '일요일 아침', who: '가족 네 명', max: 40, why: '아침부터 함께 먹을 수 있는 날이라 국이 있는 든든한 상으로 골랐습니다.' },
         { slot: 'side', title: '곁들임 반찬', who: '함께', max: 15, why: '아침상에 올릴 간단한 반찬입니다.' },
         { slot: 'family', title: '일요일 저녁', who: '가족 네 명', max: 40, why: '한 주를 마무리하는 저녁이라 양이 넉넉한 메뉴로 골랐습니다.' },
-        { slot: 'jeomjeo', title: '점심 · 간단히', who: '각자', max: 20, why: '아침과 저녁이 든든하므로 점심은 가볍게 준비합니다.' }
+        { slot: 'jeomjeo', title: '점심 · 간단히', who: '각자', max: 20, why: '아침과 저녁이 든든하므로 점심은 가볍게 준비합니다.' },
+        { slot: 'snack', title: '간식', who: '아이들', max: 30, why: '주말 오후에 아이들과 함께 만들어 먹기 좋은 간식입니다.' }
       ]
     };
   }
@@ -169,6 +171,10 @@ function viewHome() {
 
   const trending = RECIPES.filter((r) => r.traits.includes('trend'));
 
+  const protein = RECIPES.filter((r) => r.traits.includes('protein') && r.time <= 20).sort(
+    (a, b) => a.time - b.time
+  );
+
   app.innerHTML = `
     <div class="view">
       <section class="wrap hero">
@@ -226,6 +232,18 @@ function viewHome() {
       <section class="wrap list-section">
         <div class="section-head">
           <div>
+            <span class="eyebrow">단백질 챙기기</span>
+            <h2>단백질 위주로 먹고 싶을 때</h2>
+            <p>단백질이 넉넉하면서 20분 안에 차릴 수 있는 메뉴입니다.</p>
+          </div>
+          <a class="link-more" href="#/theme/onedish">더 보기 →</a>
+        </div>
+        <div class="card-grid">${protein.slice(0, 4).map(cardHTML).join('')}</div>
+      </section>
+
+      <section class="wrap list-section">
+        <div class="section-head">
+          <div>
             <span class="eyebrow">시간이 없을 때</span>
             <h2>12분 안에 끝나는 메뉴</h2>
             <p>재료가 적고 조리가 단순해 바쁜 날에도 부담이 없습니다.</p>
@@ -268,6 +286,8 @@ function themeIcon(kind) {
     return `<svg ${common}><path d="M3 11h18a9 9 0 0 1-18 0Z"/><path d="M12 11V4"/><path d="M9 6.5c0-1.5 1.3-2.5 3-2.5s3 1 3 2.5"/></svg>`;
   if (kind === 'side')
     return `<svg ${common}><rect x="3" y="6" width="8" height="12" rx="2"/><rect x="13" y="6" width="8" height="5" rx="1.5"/><rect x="13" y="13" width="8" height="5" rx="1.5"/></svg>`;
+  if (kind === 'snack')
+    return `<svg ${common}><path d="M12 3a9 9 0 1 0 9 9 4 4 0 0 1-5-5 4 4 0 0 1-4-4Z"/><circle cx="9" cy="10" r="1"/><circle cx="13" cy="15" r="1"/><circle cx="8" cy="15" r="1"/></svg>`;
   return `<svg ${common}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`;
 }
 
@@ -275,6 +295,7 @@ function themeIcon(kind) {
 const FILTERS = [
   { id: 'all', label: '전체' },
   { id: 'trend', label: '요즘 인기' },
+  { id: 'popular', label: '조회수 상위' },
   { id: 'quick', label: '15분 이내' },
   { id: 'protein', label: '단백질 든든' },
   { id: 'kid', label: '아이 입맛' },
