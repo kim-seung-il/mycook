@@ -169,6 +169,38 @@ function viewHome() {
     (r) => r.slots.includes('family') || r.slots.includes('familyAM')
   ).slice(0, 4);
 
+  // 앞으로 3일치 식사 계획
+  const upcoming = [1, 2, 3].map((n) => {
+    const d = new Date();
+    d.setDate(d.getDate() + n);
+    const c = todayContext(d);
+    return { date: d, ctx: c, plan: buildTodayPlan(c, d) };
+  });
+
+  const upcomingCards = upcoming
+    .map(
+      (u) => `
+      <article class="day-card">
+        <div class="day-head">
+          <span class="dd">${u.date.getMonth() + 1}월 ${u.date.getDate()}일 <b>${DAY_KO[u.date.getDay()]}</b></span>
+          <span class="chip">${esc(u.ctx.status.replace(/^.*· /, ''))}</span>
+        </div>
+        <ul class="day-list">
+          ${u.plan
+            .slice(0, 4)
+            .map(
+              (p) => `<li>
+                <span class="s">${esc(p.title)}</span>
+                <a href="#/recipe/${p.recipe.id}">${esc(p.recipe.name)}</a>
+                <span class="t">${p.recipe.time}분</span>
+              </li>`
+            )
+            .join('')}
+        </ul>
+      </article>`
+    )
+    .join('');
+
   const trending = RECIPES.filter((r) => r.traits.includes('trend'));
 
   const protein = RECIPES.filter((r) => r.traits.includes('protein') && r.time <= 20).sort(
@@ -205,6 +237,17 @@ function viewHome() {
           <div class="plan-foot">
             <span class="hint">가족의 생활 패턴(엄마 출근일, 아이들 학원 일정, 주말 가족 식사)을 기준으로 매일 자동으로 바뀝니다.</span>
           </div>
+        </div>
+
+        <div class="upcoming">
+          <div class="up-head">
+            <div>
+              <span class="eyebrow">앞으로 3일</span>
+              <h3>미리 보는 식사 계획</h3>
+            </div>
+            <span class="hint">장보기 전에 훑어보기 좋습니다.</span>
+          </div>
+          <div class="up-grid">${upcomingCards}</div>
         </div>
       </section>
 
@@ -509,6 +552,7 @@ function openCook(r) {
     }`;
   cookEl.classList.add('on');
   document.body.style.overflow = 'hidden';
+  updateVoiceButton();
   renderCook();
   requestWakeLock();
 }
@@ -543,11 +587,64 @@ function renderCook() {
     cookIdx === cookSteps.length - 1 ? '요리 끝내기' : '다음 단계';
   document.querySelector('.cook-body').scrollTop = 0;
   document.getElementById('cookMain').parentElement.scrollTop = 0;
+  speakStep();
+}
+
+/* 요리 중에는 손이 자유롭지 않으니 단계를 소리로 읽어줍니다 */
+const VOICE_KEY = 'mycook.voice';
+let voiceOn = false;
+try {
+  voiceOn = localStorage.getItem(VOICE_KEY) === '1';
+} catch (e) {}
+
+const voiceSupported = 'speechSynthesis' in window;
+
+function stepText(s) {
+  const body = s.list ? s.d.split('\n').join(' ') : s.d;
+  return `${s.t}. ${body}${s.tip ? ' 요령. ' + s.tip : ''}`;
+}
+
+function speakStep() {
+  if (!voiceOn || !voiceSupported) return;
+  const s = cookSteps[cookIdx];
+  if (!s) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(stepText(s));
+    u.lang = 'ko-KR';
+    u.rate = 0.95;
+    const ko = speechSynthesis
+      .getVoices()
+      .find((v) => v.lang && v.lang.toLowerCase().indexOf('ko') === 0);
+    if (ko) u.voice = ko;
+    speechSynthesis.speak(u);
+  } catch (e) {
+    /* 음성을 지원하지 않는 환경이면 조용히 넘어갑니다 */
+  }
+}
+
+function stopSpeaking() {
+  if (!voiceSupported) return;
+  try {
+    speechSynthesis.cancel();
+  } catch (e) {}
+}
+
+function updateVoiceButton() {
+  const btn = document.getElementById('cookVoice');
+  if (!btn) return;
+  btn.classList.toggle('on', voiceOn);
+  btn.setAttribute('aria-label', voiceOn ? '읽어주기 끄기' : '읽어주기 켜기');
+  btn.title = voiceOn ? '읽어주기 끄기' : '읽어주기 켜기';
+  btn.innerHTML = voiceOn
+    ? `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>`
+    : `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="m22 9-6 6M16 9l6 6"/></svg>`;
 }
 
 function closeCook() {
   cookEl.classList.remove('on');
   document.body.style.overflow = '';
+  stopSpeaking();
   if (wakeLock) {
     wakeLock.release().catch(() => {});
     wakeLock = null;
@@ -563,6 +660,20 @@ async function requestWakeLock() {
 }
 
 document.getElementById('cookClose').addEventListener('click', closeCook);
+
+document.getElementById('cookVoice').addEventListener('click', () => {
+  if (!voiceSupported) {
+    alert('이 브라우저는 읽어주기를 지원하지 않습니다.');
+    return;
+  }
+  voiceOn = !voiceOn;
+  try {
+    localStorage.setItem(VOICE_KEY, voiceOn ? '1' : '0');
+  } catch (e) {}
+  updateVoiceButton();
+  if (voiceOn) speakStep();
+  else stopSpeaking();
+});
 document.getElementById('cookPrev').addEventListener('click', () => {
   if (cookIdx > 0) {
     cookIdx--;
