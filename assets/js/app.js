@@ -328,9 +328,11 @@ function viewHome() {
     </div>`;
 }
 
-/* ---------------------------------------------- 메뉴 그림
- * 사진 대신 메뉴 종류에 맞는 선 그림을 붙입니다.
- * 위에서부터 먼저 맞는 규칙을 씁니다.
+/* ---------------------------------------------- 메뉴 그림 (지금은 쓰지 않음)
+ * 오래된 태블릿에서 화면이 깨져 보여 2026년 11월에 화면에서 뺐습니다.
+ * 코드는 남겨두었습니다. 다시 넣으려면 cardHTML과 viewRecipe에
+ * artBlock(r, 'rc-art') / artBlock(r, 'detail-art') 를 되살리고
+ * style.css에 그림 스타일을 다시 넣으면 됩니다.
  */
 const ART_RULES = [
   ['drink', ['셰이크', '요거트 오트볼']],
@@ -409,7 +411,6 @@ function artBlock(r, cls) {
 function cardHTML(r) {
   return `
     <a class="rc" href="#/recipe/${r.id}">
-      ${artBlock(r, 'rc-art')}
       <div class="rc-top">
         <span class="rc-theme">${esc(themeNames(r))}</span>
         <span class="rc-time">${r.time}분</span>
@@ -538,8 +539,6 @@ function viewRecipe(id) {
           <a href="#/theme/${r.themes[0]}">${esc(THEMES[r.themes[0]].name)}</a>
           <span>›</span> <span>${esc(r.name)}</span>
         </div>
-
-        ${artBlock(r, 'detail-art')}
 
         <div class="detail-hero">
           <div>
