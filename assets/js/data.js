@@ -32,6 +32,7 @@ const THEMES = {
 };
 
 const TRAIT_LABEL = {
+  mine: '내가 보낸 메뉴',
   trend: '요즘 인기',
   popular: '조회수 상위',
   quick: '15분 이내',
@@ -3825,7 +3826,7 @@ const RECIPES = [
     tagline: '아삭새콤한 양배추무침에 참치를 올린 한 그릇',
     themes: ['onedish'],
     slots: ['jeomjeo', 'late', 'morning'],
-    traits: ['quick', 'protein', 'onepan'],
+    traits: ['mine', 'quick', 'protein', 'onepan'],
     time: 10,
     level: '아주 쉬움',
     servings: '1인분',

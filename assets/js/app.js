@@ -203,6 +203,9 @@ function viewHome() {
 
   const trending = RECIPES.filter((r) => r.traits.includes('trend'));
 
+  // 사용자가 보낸 영상에서 정리한 메뉴는 따로 모아 보여줍니다
+  const mine = RECIPES.filter((r) => r.source || r.traits.indexOf('mine') > -1);
+
   const protein = RECIPES.filter((r) => r.traits.includes('protein') && r.time <= 20).sort(
     (a, b) => a.time - b.time
   );
@@ -250,6 +253,22 @@ function viewHome() {
           <div class="up-grid">${upcomingCards}</div>
         </div>
       </section>
+
+      ${
+        mine.length
+          ? `<section class="wrap list-section" style="padding-top:60px">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">내가 보낸 것</span>
+                  <h2>영상에서 정리한 내 메뉴</h2>
+                  <p>보내주신 요리 영상을 레시피로 정리한 메뉴입니다.</p>
+                </div>
+                <a class="link-more" href="#/saved">내 메뉴 전체 보기 →</a>
+              </div>
+              <div class="card-grid">${mine.slice(0, 4).map(cardHTML).join('')}</div>
+            </section>`
+          : ''
+      }
 
       <section class="wrap themes">
         <div class="section-head">
@@ -768,16 +787,40 @@ function viewSaved() {
     );
   };
 
+  const mine = RECIPES.filter((r) => r.source || r.traits.indexOf('mine') > -1);
+
   app.innerHTML = `
     <div class="view">
       <section class="wrap hero" style="padding-bottom:0">
-        <div class="crumb"><a href="#/">오늘의 추천</a> <span>›</span> <span>저장한 영상</span></div>
-        <span class="eyebrow">추후 확장 기능 미리보기</span>
-        <h1>저장해둔 요리 영상 모아보기</h1>
-        <p class="hero-note">인스타그램이나 쇼츠에서 본 요리 영상의 주소를 모아두고, 요리할 때 바로 열어볼 수 있습니다.</p>
+        <div class="crumb"><a href="#/">오늘의 추천</a> <span>›</span> <span>내 메뉴</span></div>
+        <span class="eyebrow">내가 보낸 것</span>
+        <h1>내 메뉴</h1>
+        <p class="hero-note">보내주신 영상에서 정리한 메뉴와, 나중에 보려고 저장해둔 영상 주소를 여기 모았습니다.</p>
       </section>
 
       <section class="wrap list-section" style="padding-top:34px">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">영상에서 정리한 메뉴</span>
+            <h2>지금까지 ${mine.length}개</h2>
+            <p>보내주신 영상의 재료와 순서를 이 사이트 형식으로 다시 정리한 메뉴입니다.</p>
+          </div>
+        </div>
+        ${
+          mine.length
+            ? `<div class="card-grid">${mine.map(cardHTML).join('')}</div>`
+            : `<div class="empty"><h3>아직 정리한 메뉴가 없습니다</h3><p>요리 영상 주소를 보내주시면 레시피로 정리해 여기에 넣어드립니다.</p></div>`
+        }
+      </section>
+
+      <section class="wrap list-section" style="padding-top:56px">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">추후 확장 기능 미리보기</span>
+            <h2>저장해둔 영상</h2>
+            <p>나중에 다시 볼 영상의 주소를 모아둡니다.</p>
+          </div>
+        </div>
         <div class="notice">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="flex-shrink:0;margin-top:3px"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
           <span><b>아직 제안 단계인 기능입니다.</b> 지금은 이 컴퓨터의 브라우저에만 저장되고, 재료와 조리 순서를 정리해 두는 방식은 요구사항 문서의 7.5절대로 추후에 결정합니다.</span>
