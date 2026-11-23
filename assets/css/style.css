@@ -495,7 +495,7 @@ ol {
 .hero h1 {
   font-size: clamp(30px, 5.2vw, 50px);
   margin-top: 14px;
-  max-width: 16ch;
+  max-width: min(420px, 100%);
 }
 
 .hero h1 em {
@@ -507,7 +507,7 @@ ol {
   color: var(--muted);
   font-size: 15px;
   margin-top: 14px;
-  max-width: 46ch;
+  max-width: min(520px, 100%);
 }
 
 .today-badge {
@@ -1043,7 +1043,7 @@ ol {
   font-size: 16.5px;
   color: var(--ink-2);
   margin-top: 16px;
-  max-width: 54ch;
+  max-width: min(640px, 100%);
   line-height: 1.8;
 }
 
@@ -1673,7 +1673,7 @@ ol {
   font-size: 13.5px;
   color: var(--faint);
   line-height: 1.8;
-  max-width: 44ch;
+  max-width: min(420px, 100%);
 }
 
 .footer-links {
@@ -1923,6 +1923,16 @@ ol {
 
 /* 손가락으로 누르는 화면에서는 누를 곳을 키웁니다 */
 @media (pointer: coarse) {
+  /* 태블릿·휴대폰은 기기 설정으로 글자를 키우는 일이 잦습니다.
+     글 폭을 제한해 두면 큰 글자가 좁은 칸에 갇혀 한 줄에 한 단어만
+     들어가므로, 이런 기기에서는 제한을 풉니다. */
+  .hero h1,
+  .hero-note,
+  .detail-hero .lead,
+  .footer-inner p {
+    max-width: none;
+  }
+
   .nav a {
     padding: 11px 16px;
   }
