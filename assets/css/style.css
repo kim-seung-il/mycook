@@ -263,6 +263,20 @@ ol {
   display: none;
 }
 
+/* 메뉴가 여덟 개라 좁은 화면에서는 간격을 줄여 한 줄에 담습니다 */
+@media (min-width: 861px) and (max-width: 1240px) {
+  .brand-sub {
+    display: none;
+  }
+  .header-inner {
+    gap: 14px;
+  }
+  .nav a {
+    padding: 8px 10px;
+    font-size: 13.5px;
+  }
+}
+
 @media (max-width: 860px) {
   .header-inner {
     height: 62px;
@@ -786,6 +800,11 @@ ol {
 .theme-card:nth-child(3) .tc-ico {
   background: var(--gold-soft);
   color: var(--gold);
+}
+
+.theme-card:nth-child(5) .tc-ico {
+  background: var(--olive-soft);
+  color: var(--olive);
 }
 
 .theme-card h3 {

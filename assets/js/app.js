@@ -427,6 +427,8 @@ function themeIcon(kind) {
     return `<svg ${common}><path d="M3 11h18a9 9 0 0 1-18 0Z"/><path d="M12 11V4"/><path d="M9 6.5c0-1.5 1.3-2.5 3-2.5s3 1 3 2.5"/></svg>`;
   if (kind === 'side')
     return `<svg ${common}><rect x="3" y="6" width="8" height="12" rx="2"/><rect x="13" y="6" width="8" height="5" rx="1.5"/><rect x="13" y="13" width="8" height="5" rx="1.5"/></svg>`;
+  if (kind === 'soup')
+    return `<svg ${common}><path d="M4 11h16a8 8 0 0 1-16 0Z"/><path d="M2 11h20"/><path d="M8 6c-1.2-1.2 1.2-2 0-3.4M12 5.4c-1.2-1.2 1.2-2 0-3.4M16 6c-1.2-1.2 1.2-2 0-3.4"/></svg>`;
   if (kind === 'snack')
     return `<svg ${common}><path d="M12 3a9 9 0 1 0 9 9 4 4 0 0 1-5-5 4 4 0 0 1-4-4Z"/><circle cx="9" cy="10" r="1"/><circle cx="13" cy="15" r="1"/><circle cx="8" cy="15" r="1"/></svg>`;
   return `<svg ${common}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`;
