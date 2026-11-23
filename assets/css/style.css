@@ -1864,23 +1864,6 @@ ol {
   opacity: 0.5;
 }
 
-@media print {
-  .site-header,
-  .site-footer,
-  .sh-bar,
-  .crumb,
-  .hero-note,
-  .eyebrow {
-    display: none !important;
-  }
-  .sh-list {
-    grid-template-columns: 1fr 1fr;
-  }
-  .sh-group {
-    break-inside: avoid;
-    box-shadow: none;
-  }
-}
 
 /* ---------------------------------------------- 읽어주기 버튼 */
 .voice-btn {
@@ -1975,6 +1958,281 @@ ol {
   .step .sd,
   .ing-list li {
     font-size: 16.5px;
+  }
+}
+
+/* ---------------------------------------------- 종이 인쇄 */
+.print-head {
+  display: none;
+}
+
+.print-btn {
+  margin-top: 10px;
+}
+
+.plan-foot .print-btn {
+  margin-top: 0;
+}
+
+@media print {
+  @page {
+    margin: 15mm 14mm;
+  }
+
+  /* 종이에서는 늘 밝은 바탕에 검은 글씨로 */
+  :root,
+  :root[data-theme='dark'] {
+    --bg: #fff;
+    --bg-deep: #fff;
+    --surface: #fff;
+    --surface-2: #fff;
+    --ink: #000;
+    --ink-2: #1a1a1a;
+    --muted: #444;
+    --faint: #666;
+    --line: #bbb;
+    --line-soft: #ddd;
+    --accent: #000;
+    --accent-ink: #000;
+    --accent-soft: #fff;
+    --olive: #000;
+    --olive-soft: #fff;
+    --gold: #000;
+    --gold-soft: #fff;
+  }
+
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.6;
+  }
+
+  .wrap {
+    max-width: none;
+    padding: 0;
+  }
+
+  /* 화면에서만 쓰는 것들은 종이에 내보내지 않습니다 */
+  .site-header,
+  .site-footer,
+  .cook,
+  .crumb,
+  .filters,
+  .sh-bar,
+  .icon-btn,
+  .btn,
+  .link-more,
+  .saved-form,
+  .notice,
+  .cook-hint,
+  .view-home .list-section,
+  .view-home .themes,
+  .plan-foot,
+  .plan-context {
+    display: none !important;
+  }
+
+  .print-head {
+    display: block;
+    font-size: 9pt;
+    color: #444;
+    border-bottom: 1px solid #bbb;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+
+  .hero,
+  .detail,
+  .list-section {
+    padding: 0 !important;
+  }
+
+  .hero-note,
+  .section-head p {
+    color: #333;
+  }
+
+  /* 레시피 — 재료를 먼저, 그다음 조리 순서 */
+  .detail-hero {
+    display: block;
+    border-bottom: 1px solid #bbb;
+    padding-bottom: 12px;
+  }
+
+  .detail-hero h1 {
+    font-size: 22pt;
+  }
+
+  .detail-hero .lead {
+    font-size: 10.5pt;
+    max-width: none;
+  }
+
+  .spec {
+    border: 0;
+    padding: 0;
+    margin-top: 10px;
+  }
+
+  .spec-row {
+    display: inline-block;
+    border: 0;
+    padding: 0;
+    margin-right: 18px;
+  }
+
+  .spec-row .k::after {
+    content: ' ';
+  }
+
+  .spec-row .v {
+    font-size: 11pt;
+  }
+
+  .detail-body {
+    display: block;
+    padding: 14px 0 0;
+  }
+
+  .side-col {
+    position: static;
+    margin-bottom: 16px;
+  }
+
+  .panel {
+    border: 1px solid #bbb;
+    padding: 12px 14px;
+    break-inside: avoid;
+  }
+
+  .ing-list {
+    columns: 2;
+    column-gap: 24px;
+  }
+
+  .ing-list li {
+    break-inside: avoid;
+    padding: 4px 0;
+  }
+
+  .step,
+  .prep-box,
+  .finish-box,
+  .tips-list li,
+  .day-card,
+  .plan-card,
+  .sh-group,
+  .rc {
+    break-inside: avoid;
+  }
+
+  .step {
+    padding: 10px 0;
+  }
+
+  .step .sd {
+    font-size: 10.5pt;
+  }
+
+  .finish-box {
+    background: #fff;
+    color: #000;
+    border: 1px solid #000;
+  }
+
+  .finish-box h3,
+  .finish-box p {
+    color: #000;
+    opacity: 1;
+  }
+
+  .chip {
+    border: 1px solid #999;
+    background: #fff;
+    color: #000;
+  }
+
+  /* 오늘의 추천과 3일 계획 */
+  .plan {
+    border: 1px solid #bbb;
+    padding: 14px;
+    break-inside: avoid;
+  }
+
+  .plan::after {
+    display: none;
+  }
+
+  .plan-grid,
+  .up-grid {
+    display: block;
+  }
+
+  .plan-card,
+  .day-card {
+    border: 0;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0;
+    padding: 8px 0;
+  }
+
+  .plan-ing {
+    color: #333;
+  }
+
+  /* 장보기 목록 — 두 칸으로 */
+  .sh-list {
+    display: block;
+    columns: 2;
+    column-gap: 24px;
+  }
+
+  .sh-group {
+    border: 1px solid #bbb;
+    margin-bottom: 12px;
+  }
+
+  .sh-row input {
+    /* 종이에서는 손으로 체크할 수 있게 빈 네모로 */
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #333;
+  }
+
+  .sh-row.done .nm,
+  .sh-row.done .qt {
+    text-decoration: line-through;
+  }
+
+  /* 메뉴 목록은 카드 대신 한 줄씩 */
+  .card-grid {
+    display: block;
+  }
+
+  .rc {
+    border: 0;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0;
+    padding: 8px 0;
+  }
+
+  .rc::before {
+    display: none;
+  }
+
+  a {
+    text-decoration: none;
+    color: #000;
   }
 }
 

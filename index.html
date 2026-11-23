@@ -21,7 +21,7 @@
     />
     <!-- ?v= 는 브라우저가 옛 파일을 계속 쓰지 않도록 붙인 버전 표시입니다.
          파일을 고친 뒤 화면이 그대로면 이 숫자를 1 올리세요. -->
-    <link rel="stylesheet" href="assets/css/style.css?v=19" />
+    <link rel="stylesheet" href="assets/css/style.css?v=20" />
   </head>
   <body>
     <!-- ───────────────────────── 헤더 ───────────────────────── -->
@@ -69,6 +69,11 @@
         </button>
       </div>
     </header>
+
+    <!-- 종이에 인쇄할 때만 보이는 머리글 -->
+    <div class="print-head" aria-hidden="true">
+      <strong>마이쿡</strong> · 우리 가족의 식사 시간표
+    </div>
 
     <!-- ───────────────────────── 본문 ───────────────────────── -->
     <main id="app"></main>
@@ -122,7 +127,7 @@
       </div>
     </div>
 
-    <script src="assets/js/data.js?v=19"></script>
-    <script src="assets/js/app.js?v=19"></script>
+    <script src="assets/js/data.js?v=20"></script>
+    <script src="assets/js/app.js?v=20"></script>
   </body>
 </html>

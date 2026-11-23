@@ -211,7 +211,7 @@ function viewHome() {
   );
 
   app.innerHTML = `
-    <div class="view">
+    <div class="view view-home">
       <section class="wrap hero">
         <div class="hero-top">
           <div>
@@ -238,6 +238,10 @@ function viewHome() {
           </div>
           <div class="plan-grid">${planCards}</div>
           <div class="plan-foot">
+            <button class="btn btn-ghost print-btn" onclick="window.print()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6Z"/></svg>
+              식단표 인쇄하기
+            </button>
             <span class="hint">가족의 생활 패턴(엄마 출근일, 아이들 학원 일정, 주말 가족 식사)을 기준으로 매일 자동으로 바뀝니다.</span>
           </div>
         </div>
@@ -561,6 +565,10 @@ function viewRecipe(id) {
             <button class="btn btn-primary" id="startCook">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 4 14 8-14 8Z"/></svg>
               요리 모드로 보기
+            </button>
+            <button class="btn btn-ghost print-btn" onclick="window.print()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6Z"/></svg>
+              종이로 인쇄하기
             </button>
           </div>
         </div>
@@ -1142,6 +1150,7 @@ function viewShopping() {
           </div>
           <span class="sh-range" id="shRange"></span>
           <div class="sh-acts">
+            <button class="sc-btn" onclick="window.print()">인쇄</button>
             <button class="sc-btn" id="shCopy">목록 복사</button>
             <button class="sc-btn" id="shReset">체크 지우기</button>
           </div>
