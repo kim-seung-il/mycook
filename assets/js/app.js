@@ -967,13 +967,13 @@ function viewSaved() {
 /* 마트에서 도는 순서대로 묶습니다. 위에서부터 먼저 맞는 규칙을 씁니다. */
 const MART_RULES = [
   // 양념은 집에 있을 수 있으니 따로 모읍니다
-  ['양념 · 조미료', ['땅콩버터', '콩가루', '다진 마늘', '진간장', '국간장', '간장', '고추장', '된장', '고춧가루', '설탕', '소금', '후추', '식용유', '올리브유', '참기름', '들기름', '식초', '맛술', '올리고당', '꿀', '메이플', '연유', '마요네즈', '케첩', '머스터드', '굴소스', '새우젓', '액젓', '카레가루', '전분', '부침가루', '베이킹파우더', '통깨', '검은깨', '계피', '코코아', '파슬리', '파마산', '치즈가루', '버터', '국물내기 팩', '레몬즙', '배즙', '사과즙']],
-  ['가공식품 · 냉장', ['참치 통조림', '김치', '카레 고형 루', '파스타 소스', '소스', '견과류', '맛살']],
-  ['수산 · 건어물', ['어묵', '새우', '멸치', '진미채', '미역', '다시마', '김가루', '구운 김', '유부']],
-  ['정육 · 계란', ['돼지고기', '소고기', '불고기용', '닭가슴살', '닭다리', '닭봉', '베이컨', '소시지', '스팸', '햄', '메추리알', '달걀', '계란']],
+  ['양념 · 조미료', ['땅콩버터', '콩가루', '다진 마늘', '진간장', '국간장', '간장', '고추장', '된장', '고춧가루', '설탕', '소금', '후추', '식용유', '올리브유', '참기름', '들기름', '식초', '맛술', '올리고당', '꿀', '메이플', '연유', '마요네즈', '케첩', '머스터드', '굴소스', '새우젓', '액젓', '카레가루', '전분', '부침가루', '베이킹파우더', '통깨', '검은깨', '계피', '코코아', '파슬리', '파마산', '치즈가루', '버터', '국물내기 팩', '가쓰오부시', '강황', '매실청', '레몬즙', '배즙', '사과즙']],
+  ['가공식품 · 냉장', ['참치 통조림', '참치캔', '참치', '김치', '카레 고형 루', '파스타 소스', '소스', '견과류', '견과', '아몬드', '호두', '맛살', '냉동 만두', '만두', '옥수수', '다크초콜릿', '초콜릿', '젤라틴']],
+  ['수산 · 건어물', ['어묵', '새우', '멸치', '진미채', '북어', '미역', '다시마', '김가루', '구운 김', '김', '유부']],
+  ['정육 · 계란', ['돼지고기', '소고기', '불고기용', '닭고기', '닭가슴살', '닭다리', '닭봉', '생닭', '닭', '베이컨', '소시지', '스팸', '햄', '메추리알', '달걀', '계란']],
   ['유제품 · 두부', ['두부', '우유', '두유', '요거트', '생크림', '치즈']],
-  ['쌀 · 면 · 빵 · 떡', ['쌀', '밥', '식빵', '통밀빵', '빵', '스파게티', '우동 사리', '당면', '떡', '오트밀', '귀리']],
-  ['채소 · 과일', ['양파', '대파', '쪽파', '마늘', '감자', '고구마', '당근', '애호박', '호박', '오이', '배추', '양배추', '양상추', '깻잎', '고추', '파프리카', '피망', '버섯', '팽이', '느타리', '표고', '시금치', '콩나물', '바나나', '사과', '딸기', '블루베리', '토마토', '생강']]
+  ['쌀 · 면 · 빵 · 떡', ['쌀', '밥', '식빵', '통밀빵', '빵', '스파게티', '소면', '우동 사리', '우동', '당면', '떡', '오트밀', '귀리']],
+  ['채소 · 과일', ['양파', '대파', '쪽파', '마늘', '감자', '고구마', '당근', '애호박', '호박', '오이', '배추', '양배추', '양상추', '깻잎', '고추', '파프리카', '피망', '버섯', '팽이', '느타리', '표고', '시금치', '콩나물', '숙주', '가지', '브로콜리', '아보카도', '부추', '바나나', '사과', '딸기', '블루베리', '토마토', '생강']]
 ];
 
 const SKIP_PREFIX = ['물', '찬물', '쌀뜨물'];
@@ -1197,6 +1197,341 @@ function viewShopping() {
   render();
 }
 
+/* ---------------------------------------------- 재료로 찾기
+ * 냉장고에 있는 재료를 고르면 그걸로 만들 수 있는 메뉴를 보여줍니다.
+ *
+ * 레시피마다 재료 이름이 조금씩 다릅니다. "김치"도 어떤 메뉴에는
+ * "신김치", 어떤 메뉴에는 "잘 익은 김치"로 적혀 있습니다. 그대로 두면
+ * 같은 재료인데 따로 떨어져 고를 수가 없어서, 아래 규칙으로 대표 이름
+ * 하나에 묶습니다. 위에서부터 먼저 맞는 규칙을 씁니다.
+ *
+ * 새 재료를 쓰는 메뉴를 넣었는데 화면에 안 보이면 여기에 한 줄 더하세요. */
+const ING_SAME = [
+  // 뒤에 오는 넓은 규칙에 잘못 걸리는 것들을 먼저 빼냅니다
+  ['새우젓', ['새우젓']],
+  ['전분', ['전분', '부침가루']],
+  ['파스타 소스', ['파스타 소스', '소스']],
+
+  // 유제품 · 두부
+  ['순두부', ['순두부', '연두부']],
+  ['두부', ['두부']],
+  ['치즈', ['치즈']],
+  ['요거트', ['요거트']],
+  ['생크림', ['생크림']],
+  ['우유', ['우유', '두유']],
+
+  // 정육 · 계란
+  ['달걀', ['달걀', '계란']],
+  ['메추리알', ['메추리알']],
+  ['돼지고기', ['돼지고기', '목살']],
+  ['소고기', ['소고기']],
+  ['닭고기', ['닭가슴살', '닭다리', '닭봉', '생닭', '닭']],
+  ['베이컨', ['베이컨']],
+  ['소시지', ['소시지']],
+  ['햄 · 스팸', ['스팸', '햄']],
+
+  // 가공식품 · 냉장
+  ['김치', ['김치']],
+  ['참치캔', ['참치']],
+  ['냉동 만두', ['만두']],
+  ['카레 고형 루', ['카레']],
+  ['견과', ['견과', '아몬드', '호두']],
+  ['다크초콜릿', ['초콜릿']],
+  ['젤라틴', ['젤라틴']],
+  ['옥수수 캔', ['옥수수']],
+  ['맛살', ['맛살']],
+
+  // 수산 · 건어물 ('김가루'와 '김치'보다 뒤에 '김'이 와야 합니다)
+  ['어묵', ['어묵']],
+  ['새우', ['새우']],
+  ['멸치', ['멸치']],
+  ['진미채', ['진미채']],
+  ['북어채', ['북어']],
+  ['미역', ['미역']],
+  ['유부', ['유부']],
+  ['김가루', ['김가루']],
+  ['김', ['구운 김', '김']],
+
+  // 쌀 · 면 · 빵 · 떡
+  ['밥', ['밥']],
+  ['쌀', ['쌀']],
+  ['식빵', ['식빵', '통밀빵', '빵']],
+  ['소면', ['소면']],
+  ['우동 사리', ['우동']],
+  ['스파게티 면', ['스파게티']],
+  ['당면', ['당면']],
+  ['떡', ['떡']],
+  ['오트밀', ['오트밀', '귀리']],
+
+  // 채소 · 과일 ('양배추'가 '배추'보다 앞에 있어야 합니다)
+  ['양파', ['양파']],
+  ['대파', ['대파']],
+  ['쪽파', ['쪽파']],
+  ['부추', ['부추']],
+  ['마늘', ['마늘']],
+  ['감자', ['감자']],
+  ['고구마', ['고구마']],
+  ['당근', ['당근']],
+  ['애호박', ['애호박', '호박']],
+  ['오이', ['오이']],
+  ['양배추', ['양배추']],
+  ['양상추', ['양상추']],
+  ['배추', ['배추']],
+  ['깻잎', ['깻잎']],
+  ['고추', ['고추']],
+  ['파프리카', ['파프리카', '피망']],
+  ['버섯', ['버섯']],
+  ['시금치', ['시금치']],
+  ['콩나물', ['콩나물']],
+  ['숙주', ['숙주']],
+  ['가지', ['가지']],
+  ['브로콜리', ['브로콜리']],
+  ['토마토', ['토마토']],
+  ['아보카도', ['아보카도']],
+  ['바나나', ['바나나']],
+  ['사과', ['사과']],
+  ['딸기', ['딸기']],
+  ['블루베리', ['블루베리']]
+];
+
+/* 재료 이름 하나를 대표 이름으로 바꿉니다. 고를 수 없는 재료면 빈 값입니다. */
+function canonIng(raw) {
+  // "A 또는 B"는 앞의 것만 봅니다. 괄호 안 설명도 뗍니다.
+  let name = String(raw).split(' 또는 ')[0].replace(/\s*\([^)]*\)/g, '').trim();
+  if (!name) return '';
+
+  // 물은 사러 가지 않습니다
+  if (SKIP_PREFIX.indexOf(name) > -1) return '';
+
+  let canon = name;
+  for (const [rep, keys] of ING_SAME) {
+    if (keys.some((k) => name.indexOf(k) > -1)) {
+      canon = rep;
+      break;
+    }
+  }
+
+  // 소금·간장처럼 늘 집에 있는 것은 고를 재료가 아닙니다
+  if (martGroup(canon) === '양념 · 조미료') return '';
+  return canon;
+}
+
+/* 메뉴마다 "고를 수 있는 재료" 목록을 한 번만 만들어 기억해 둡니다 */
+let ingIndexCache = null;
+
+function ingIndex() {
+  if (ingIndexCache) return ingIndexCache;
+  const byRecipe = {};
+  const count = {};
+
+  RECIPES.forEach((r) => {
+    const list = [];
+    (r.ingredients || []).forEach((i) => {
+      const c = canonIng(i.n);
+      if (c && list.indexOf(c) === -1) list.push(c);
+    });
+    byRecipe[r.id] = list;
+    list.forEach((c) => (count[c] = (count[c] || 0) + 1));
+  });
+
+  // 재료를 마트 코너별로 묶고, 많이 쓰이는 것을 앞에 둡니다
+  const groups = {};
+  Object.keys(count).forEach((c) => {
+    const g = martGroup(c);
+    (groups[g] = groups[g] || []).push(c);
+  });
+  const order = ['채소 · 과일', '정육 · 계란', '유제품 · 두부', '수산 · 건어물',
+    '가공식품 · 냉장', '쌀 · 면 · 빵 · 떡', '그 밖에'];
+  const picker = order
+    .filter((g) => groups[g])
+    .map((g) => ({
+      group: g,
+      items: groups[g].sort((a, b) => count[b] - count[a] || a.localeCompare(b, 'ko'))
+    }));
+
+  ingIndexCache = { byRecipe, count, picker };
+  return ingIndexCache;
+}
+
+/* 고른 재료는 이 기기에 기억해 둡니다 */
+const FRIDGE_KEY = 'mycook.fridge';
+
+function getFridge() {
+  try {
+    const v = JSON.parse(localStorage.getItem(FRIDGE_KEY) || '[]');
+    return Array.isArray(v) ? v : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function setFridge(list) {
+  try {
+    localStorage.setItem(FRIDGE_KEY, JSON.stringify(list));
+  } catch (e) {
+    /* 저장이 막혀 있어도 화면은 그대로 씁니다 */
+  }
+}
+
+/* 고른 재료로 메뉴를 추려 "모자란 재료가 적은 순"으로 줄 세웁니다 */
+function matchRecipes(picked) {
+  const idx = ingIndex();
+  const has = {};
+  picked.forEach((p) => (has[p] = 1));
+
+  return RECIPES.map((r) => {
+    const all = idx.byRecipe[r.id] || [];
+    const have = all.filter((c) => has[c]);
+    const miss = all.filter((c) => !has[c]);
+    return { r, have, miss, all };
+  })
+    .filter((m) => m.have.length > 0)
+    .sort(
+      (a, b) =>
+        a.miss.length - b.miss.length ||
+        b.have.length - a.have.length ||
+        a.r.time - b.r.time
+    );
+}
+
+function matchCardHTML(m) {
+  const miss = m.miss.length
+    ? `<p class="rc-ing ing-miss"><b>${m.miss.length}가지만 더</b> · ${esc(m.miss.join(' · '))}</p>`
+    : `<p class="rc-ing ing-ok"><b>재료가 다 있습니다</b></p>`;
+  return `
+    <a class="rc" href="#/recipe/${m.r.id}">
+      <div class="rc-top">
+        <span class="rc-theme">${esc(themeNames(m.r))}</span>
+        <span class="rc-time">${m.r.time}분</span>
+      </div>
+      <h3>${esc(m.r.name)}</h3>
+      <p class="rc-tag">${esc(m.r.tagline)}</p>
+      <p class="rc-ing ing-have"><b>가진 재료 ${m.have.length}가지</b> · ${esc(m.have.join(' · '))}</p>
+      ${miss}
+    </a>`;
+}
+
+let ingQuery = '';
+
+function viewIngredients() {
+  const idx = ingIndex();
+
+  const render = () => {
+    const picked = getFridge();
+
+    // 재료 고르는 칸
+    const q = ingQuery.trim();
+    document.getElementById('ingPick').innerHTML = idx.picker
+      .map((g) => {
+        const items = q ? g.items.filter((c) => c.indexOf(q) > -1) : g.items;
+        if (!items.length) return '';
+        return `
+          <div class="ing-group">
+            <h3>${esc(g.group)}</h3>
+            <div class="ing-chips">
+              ${items
+                .map(
+                  (c) =>
+                    `<button class="fbtn ing-chip${picked.indexOf(c) > -1 ? ' on' : ''}" data-i="${esc(c)}">${esc(c)} <span class="cnt">${idx.count[c]}</span></button>`
+                )
+                .join('')}
+            </div>
+          </div>`;
+      })
+      .join('') ||
+      `<div class="empty"><h3>그런 재료는 없습니다</h3><p>다른 말로 찾아보세요.</p></div>`;
+
+    document.querySelectorAll('.ing-chip').forEach((b) =>
+      b.addEventListener('click', () => {
+        const list = getFridge();
+        const at = list.indexOf(b.dataset.i);
+        if (at > -1) list.splice(at, 1);
+        else list.push(b.dataset.i);
+        setFridge(list);
+        render();
+      })
+    );
+
+    // 고른 재료 요약
+    document.getElementById('ingCount').textContent = picked.length
+      ? `${picked.length}가지 골랐습니다 · ${picked.join(' · ')}`
+      : '아직 고른 재료가 없습니다';
+    document.getElementById('ingClear').style.display = picked.length ? '' : 'none';
+
+    // 결과
+    const out = document.getElementById('ingResult');
+    if (!picked.length) {
+      out.innerHTML = `
+        <div class="empty">
+          <h3>냉장고에 있는 재료를 눌러보세요</h3>
+          <p>고른 재료가 들어가는 메뉴를, 더 사야 할 재료가 적은 순서로 보여줍니다.</p>
+        </div>`;
+      return;
+    }
+
+    const all = matchRecipes(picked);
+    const now = all.filter((m) => m.miss.length === 0);
+    const soon = all.filter((m) => m.miss.length > 0 && m.miss.length <= 2);
+    const later = all.filter((m) => m.miss.length > 2).slice(0, 12);
+
+    const block = (title, note, list) =>
+      list.length
+        ? `<section class="ing-result-group">
+             <div class="section-head">
+               <div>
+                 <h2>${title} <span class="cnt">${list.length}</span></h2>
+                 <p>${note}</p>
+               </div>
+             </div>
+             <div class="card-grid">${list.map(matchCardHTML).join('')}</div>
+           </section>`
+        : '';
+
+    out.innerHTML =
+      block('지금 바로 만들 수 있어요', '고른 재료만으로 끝납니다. 양념은 집에 있는 것으로 봤습니다.', now) +
+      block('1~2가지만 더 사면', '빠진 재료는 카드마다 적어두었습니다.', soon) +
+      block('조금 더 사야 해요', '고른 재료가 들어가긴 합니다. 많이 나오는 순서로 12개만 보여줍니다.', later) ||
+      `<div class="empty">
+         <h3>맞는 메뉴가 없습니다</h3>
+         <p>재료를 몇 가지 더 골라보세요.</p>
+       </div>`;
+  };
+
+  app.innerHTML = `
+    <div class="view">
+      <section class="wrap hero" style="padding-bottom:0">
+        <div class="crumb"><a href="#/">오늘의 추천</a> <span>›</span> <span>재료로 찾기</span></div>
+        <span class="eyebrow">재료로 찾기</span>
+        <h1>있는 재료로 뭘 만들까</h1>
+        <p class="hero-note">냉장고에 있는 것을 눌러두면 그걸로 만들 수 있는 메뉴를 찾아줍니다. 고른 재료는 이 기기에 기억되니 다음에 와도 그대로 있습니다.</p>
+      </section>
+
+      <section class="wrap list-section" style="padding-top:30px">
+        <div class="ing-bar">
+          <input class="ing-search" id="ingSearch" type="search" placeholder="재료 이름으로 찾기 (예: 두부)" aria-label="재료 이름으로 찾기" />
+          <span class="ing-count" id="ingCount"></span>
+          <button class="sc-btn" id="ingClear">고른 재료 지우기</button>
+        </div>
+        <div class="ing-pick" id="ingPick"></div>
+        <div id="ingResult"></div>
+      </section>
+    </div>`;
+
+  const search = document.getElementById('ingSearch');
+  search.value = ingQuery;
+  search.addEventListener('input', () => {
+    ingQuery = search.value;
+    render();
+  });
+
+  document.getElementById('ingClear').addEventListener('click', () => {
+    setFridge([]);
+    render();
+  });
+
+  render();
+}
+
 function viewNotFound() {
   app.innerHTML = `
     <div class="view wrap" style="padding-top:80px">
@@ -1218,6 +1553,7 @@ function route() {
     activeFilter = 'all';
     viewTheme(arg);
   } else if (seg === 'recipe') viewRecipe(arg);
+  else if (seg === 'ingredients') viewIngredients();
   else if (seg === 'saved') viewSaved();
   else if (seg === 'shopping') viewShopping();
   else viewNotFound();

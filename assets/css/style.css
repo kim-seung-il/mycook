@@ -18,6 +18,9 @@
   --accent: #a8472a;
   --accent-soft: #f4e5de;
   --accent-ink: #7c3320;
+
+  /* 재료가 다 있을 때 쓰는 녹색 */
+  --ok: #2f7d52;
   --olive: #4a5a3f;
   --olive-soft: #e9eee3;
   --gold: #b0894a;
@@ -60,6 +63,7 @@
     --accent: #e08261;
     --accent-soft: #3a2219;
     --accent-ink: #f0a98d;
+    --ok: #6cc08d;
     --olive: #a8bf96;
     --olive-soft: #232a1e;
     --gold: #d6b073;
@@ -84,6 +88,7 @@
   --accent: #e08261;
   --accent-soft: #3a2219;
   --accent-ink: #f0a98d;
+  --ok: #6cc08d;
   --olive: #a8bf96;
   --olive-soft: #232a1e;
   --gold: #d6b073;
@@ -1984,6 +1989,107 @@ ol {
   margin-top: 0;
 }
 
+/* ---------------------------------------------- 재료로 찾기 */
+.ing-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.ing-search {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14.5px;
+  font-family: inherit;
+}
+
+.ing-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.ing-count {
+  flex: 1 1 260px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.ing-group {
+  margin-bottom: 20px;
+}
+
+.ing-group h3 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  margin-bottom: 10px;
+}
+
+.ing-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ing-chip .cnt {
+  font-size: 11px;
+  color: var(--faint);
+  margin-left: 2px;
+}
+
+.ing-chip.on .cnt {
+  color: inherit;
+  opacity: 0.6;
+}
+
+.ing-pick {
+  padding-bottom: 28px;
+  margin-bottom: 34px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.ing-result-group {
+  margin-bottom: 46px;
+}
+
+.ing-result-group .section-head h2 .cnt {
+  font-size: 15px;
+  color: var(--faint);
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.rc .ing-have {
+  border-top: 1px dashed var(--line);
+}
+
+.rc .ing-miss,
+.rc .ing-ok {
+  margin-top: 6px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.rc .ing-miss b {
+  color: var(--accent);
+}
+
+.rc .ing-ok b {
+  color: var(--ok);
+}
+
 @media print {
   @page {
     margin: 15mm 14mm;
@@ -2005,6 +2111,7 @@ ol {
     --accent: #000;
     --accent-ink: #000;
     --accent-soft: #fff;
+    --ok: #000;
     --olive: #000;
     --olive-soft: #fff;
     --gold: #000;
@@ -2037,6 +2144,8 @@ ol {
   .crumb,
   .filters,
   .sh-bar,
+  .ing-bar,
+  .ing-pick,
   .icon-btn,
   .btn,
   .link-more,
